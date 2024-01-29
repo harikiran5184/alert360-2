@@ -202,23 +202,55 @@ app.post('/notifyNearBy',async (req,res)=>{
     }
 })
 
- async function notification(token,body){
-    const message={
-        to: token,
-        title:"ALERT!!!",
-        body:`There is a ${body.toUpperCase()},please be safe`,
-        sound:"default"
+ //async function notification(token,body){
+//    const message={
+  //      to: token,
+//        title:"ALERT!!!",
+ //       body:`There is a ${body.toUpperCase()},please be safe`,
+//        sound:"default"
+//    }
+//    await fetch('https://exp.host/--/api/v2/push/send',{
+//        method:"POST",
+//        headers:{
+//        host: "exp.host",
+//        accept: "application/json",
+//        "accept-encoding": "gzip, deflate",
+//        "content-type": "application/json"},
+//        body:JSON.stringify(message)
+//    })
+//  }
+const { Expo } = require('expo-server-sdk');
+
+async function notification(token, body) {
+  const expo = new Expo();
+
+  console.log(token, body);
+
+  const message = {
+    to: token,
+    sound: 'default',
+    title: 'ALERT!!!',
+    body: `There is a ${body.toUpperCase()}, please be safe`,
+    data: { body: body.toUpperCase() }, // Include additional data if needed
+  };
+
+  try {
+    // Send the notification using expo.sendPushNotificationsAsync()
+    const { data } = await expo.sendPushNotificationsAsync([message]);
+
+    // Check the response from Expo's push notification service
+    if (data[0].status === 'ok') {
+      console.log('Notification sent successfully:', data);
+      return true;
+    } else {
+      console.error('Failed to send notification:', data[0].details);
+      return false;
     }
-    await fetch('https://exp.host/--/api/v2/push/send',{
-        method:"POST",
-        headers:{
-        host: "exp.host",
-        accept: "application/json",
-        "accept-encoding": "gzip, deflate",
-        "content-type": "application/json"},
-        body:JSON.stringify(message)
-    })
+  } catch (error) {
+    console.error('Error sending notification:', error);
+    return false;
   }
+}
 
 
   app.post('/otp',async (req,res)=>{
