@@ -191,46 +191,77 @@ app.post('/notifyNearBy',async (req,res)=>{
     const s=JSON.parse(data)
     console.log(s)
     const datas=await login.find({location:s.location})
-    let y;
+    let y=[]
     try{
     datas.forEach(async element => {
         
-       y=await notification(element.DID,s.body,s.location)
-      
+      //  await notification(element.DID,s.body,s.location).then((ele)=>{
+      //   if(ele){
+      //     console.log(ele)
+      //     y.push(ele)
+
+      //   }
+      //  })
+
+
+       const serverKey = 'AAAAHRzO6m0:APA91bFcpybjQXOSlsyaZWytOnQXEwT5pdyVgk-86tntqLOibg01rMRN4AgdaIWFYZgjboEZweQlxi6ftWLb2Tiv8T7TwLIWC3fPKZgmunilVh4lOOhUYkd9AZxl5oqaVxUbFmOHeZyj'; // Replace with your service account key
+    
+       const response = await fetch('https://fcm.googleapis.com/fcm/send', {
+           method: 'POST',
+           headers: {
+             'Content-Type': 'application/json',
+             Authorization: `key=${serverKey}`,
+           },
+           body: JSON.stringify({
+             to: element.DID,
+             priority: 'normal',
+             data: {
+               experienceId: 'Alert360',
+               scopeKey: 'alert360',
+               title: "ALERT!!!!",
+               message: `we found the ${s.body.toUpperCase()} at ${s.location.toUpperCase()} , Please be safe with precautions`,
+             },
+           }),
+         });
+
+
+
     })
-    res.json({status:true})
+      res.json({status:true})
     }
     catch{
         res.json({status:false})
     }
+    async function notification(token, body,location) {
+      console.log(token, body);
+    
+      const serverKey = 'AAAAHRzO6m0:APA91bFcpybjQXOSlsyaZWytOnQXEwT5pdyVgk-86tntqLOibg01rMRN4AgdaIWFYZgjboEZweQlxi6ftWLb2Tiv8T7TwLIWC3fPKZgmunilVh4lOOhUYkd9AZxl5oqaVxUbFmOHeZyj'; // Replace with your service account key
+    
+      const response = await fetch('https://fcm.googleapis.com/fcm/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `key=${serverKey}`,
+          },
+          body: JSON.stringify({
+            to: token,
+            priority: 'normal',
+            data: {
+              experienceId: 'Alert360',
+              scopeKey: 'alert360',
+              title: "ALERT!!!!",
+              message: `we found the ${body.toUpperCase()} at ${location.toUpperCase()} , Please be safe with precautions`,
+            },
+          }),
+        });
+    
+      console.log('Response status:', response.status);
+      return response.status==200
+    }
 })
 
 
-async function notification(token, body,location) {
-    console.log(token, body);
-  
-    const serverKey = 'AAAAHRzO6m0:APA91bFcpybjQXOSlsyaZWytOnQXEwT5pdyVgk-86tntqLOibg01rMRN4AgdaIWFYZgjboEZweQlxi6ftWLb2Tiv8T7TwLIWC3fPKZgmunilVh4lOOhUYkd9AZxl5oqaVxUbFmOHeZyj'; // Replace with your service account key
-  
-    const response = await fetch('https://fcm.googleapis.com/fcm/send', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `key=${serverKey}`,
-        },
-        body: JSON.stringify({
-          to: token,
-          priority: 'normal',
-          data: {
-            experienceId: 'Alert360',
-            scopeKey: 'alert360',
-            title: "ALERT!!!!",
-            message: `we found the ${body.toUpperCase()} at ${location.toUpperCase()} , Please be safe with precautions`,
-          },
-        }),
-      });
-  
-    console.log('Response status:', response.status);
-  }
+
 
 
 
