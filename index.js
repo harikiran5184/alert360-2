@@ -198,7 +198,7 @@ app.post('/notifyNearBy',async (req,res)=>{
        y=await notification(element.DID,s.body,s.location)
       
     })
-    res.json({status:datas[0]})
+    res.json({status:true})
     }
     catch{
         res.json({status:false})
