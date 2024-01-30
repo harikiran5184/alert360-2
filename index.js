@@ -223,7 +223,7 @@ app.post('/notifyNearBy',async (req,res)=>{
              },
            }),
          });
-console.log(response)
+
 
 
     })
