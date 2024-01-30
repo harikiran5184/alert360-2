@@ -189,11 +189,14 @@ app.post('/deviceIdUpdate',async(req,res)=>{
 app.post('/notifyNearBy',async (req,res)=>{
     const {data}=req.body
     const s=JSON.parse(data)
+    console.log(s)
     const datas=await login.find({location:s.location})
+    let y;
     try{
-    datas.forEach(element => {
-        console.log(element.DID)
-        notification(element.DID,s.body)
+    datas.forEach(async element => {
+        
+       y=await notification(element.DID,s.body,s.location)
+      
     })
     res.json({status:true})
     }
@@ -202,23 +205,33 @@ app.post('/notifyNearBy',async (req,res)=>{
     }
 })
 
- //async function notification(token,body){
-//    const message={
-  //      to: token,
-//        title:"ALERT!!!",
- //       body:`There is a ${body.toUpperCase()},please be safe`,
-//        sound:"default"
-//    }
-//    await fetch('https://exp.host/--/api/v2/push/send',{
-//        method:"POST",
-//        headers:{
-//        host: "exp.host",
-//        accept: "application/json",
-//        "accept-encoding": "gzip, deflate",
-//        "content-type": "application/json"},
-//        body:JSON.stringify(message)
-//    })
-//  }
+
+async function notification(token, body,location) {
+    console.log(token, body);
+  
+    const serverKey = 'AAAAHRzO6m0:APA91bFcpybjQXOSlsyaZWytOnQXEwT5pdyVgk-86tntqLOibg01rMRN4AgdaIWFYZgjboEZweQlxi6ftWLb2Tiv8T7TwLIWC3fPKZgmunilVh4lOOhUYkd9AZxl5oqaVxUbFmOHeZyj'; // Replace with your service account key
+  
+    const response = await fetch('https://fcm.googleapis.com/fcm/send', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `key=${serverKey}`,
+        },
+        body: JSON.stringify({
+          to: token,
+          priority: 'normal',
+          data: {
+            experienceId: 'Alert360',
+            scopeKey: 'alert360',
+            title: "ALERT!!!!",
+            message: `we found the ${body.toUpperCase()} at ${location.toUpperCase()} , Please be safe with precautions`,
+          },
+        }),
+      });
+  
+    console.log('Response status:', response.status);
+  }
+
 const { Expo } = require('expo-server-sdk');
 
 async function notification(token, body) {
